@@ -1,0 +1,393 @@
+function draw() {
+  if (level == 0) {
+    chooseLevels();
+  } else if (changeLevels == true) {
+    message = "Begin";
+    circleTimer();
+    timer += 1;
+  } else {
+    start();
+
+    levels();
+    let r = round(random(80)) + 1;
+    let s = round(random(8)) + 1;
+    let t = random(1);
+
+    textSize(60);
+
+    if (level == 1) {
+      if (r < 10) {
+        r = r + 10;
+      } else if (r > 90) {
+        r = r - 10;
+      }
+      if (t < 0.5) {
+        text(r + " + 10 =   ", 40, 150);
+      } else {
+        text("10 + " + r + " =   ", 40, 150);
+      }
+      arr = [r + 8, r + 11, r + 9, r + 10];
+      arr = shuffle(arr);
+      ans = r + 10;
+    } else if (level == 2) {
+      if (r < 10) {
+        r = r + 10;
+      } else if (r > 90) {
+        r = r - 10;
+      }
+      text(r + " - 10 =  ", 40, 150);
+      arr = [r - 10, r - 9, r - 8, r - 11];
+      arr = shuffle(arr);
+      ans = r - 10;
+    } else if (level == 3) {
+      let p = Math.floor(Math.random() * 8);
+      let tenMult = nums[p];
+      print(r, tenMult);
+      if (r >= 50 && tenMult >= 50) {
+        r = round(r / 3);
+        tenMult = tenMult - 30;
+      } else if (r >= 50 && tenMult <= 50) {
+        r = round(r / 3);
+      } else if (r <= 50 && tenMult >= 90) {
+        tenMult = tenMult - 40;
+      } else if (r <= 50 && tenMult >= 80) {
+        tenMult = tenMult - 30;
+      } else if (r <= 50 && tenMult >= 70) {
+        tenMult = tenMult - 20;
+      } else if (r <= 50 && tenMult >= 60) {
+        tenMult = tenMult - 10;
+      }
+      text(r + " + " + tenMult + " =  ", 40, 150);
+      arr = [r + tenMult, r + tenMult + 1, r + tenMult + 2, r + tenMult + 3];
+      arr = shuffle(arr);
+      ans = r + tenMult;
+    } else if (level == 4) {
+
+      if (r < 10) {
+        r = 5 * (10 + r);
+      }
+      let quotient = Math.floor(r / 10);
+      let tenMult = 10 * Math.floor(Math.random() * quotient+1);
+      if (r-tenMult<10) { r= r+20;}
+      print(r - tenMult);
+
+      text(r + " - " + tenMult + " =  ", 40, 150);
+      arr = [r - tenMult, r - tenMult + 1, r - tenMult + 2, r - tenMult + 3];
+      arr = shuffle(arr);
+      ans = r - tenMult;
+    } else if (level == 5) {
+      let p = Math.floor(Math.random() * 8);
+      let tenMult = nums[p];
+      text(r + " - " + tenMult + " =  ", 40, 150);
+      arr = [r - tenMult, r - tenMult + 1, r - tenMult + 2, r - tenMult + 3];
+      arr = shuffle(arr);
+      ans = r + tenMult;
+    }
+
+    text("?", 330, 150);
+
+    textSize(42);
+    text(arr[0], 40, 240);
+    text("(A)", 40, 320);
+    text(arr[1], 140, 240);
+    text("(B)", 140, 320);
+    text(arr[2], 235, 240);
+    text("(C)", 235, 320);
+    text(arr[3], 335, 240);
+    text("(D)", 335, 320);
+    pos = arr.indexOf(ans);
+
+    score_keep();
+    levels();
+    draw_restart_button();
+    noLoop();
+  }
+}
+
+function score_keep() {
+  fill(0);
+  noStroke();
+  textSize(16);
+  text("Score: " + score + " / " + attempts, 350, 50);
+  fill(0, 88, 160);
+  rect(40, 25, 170, 40);
+  textSize(20);
+  fill(255);
+  if (changeLevels === true || attempts === 0) {
+    message = "Begin!";
+  } else if (correct === true) {
+    message = "Good job!";
+  } else if (correct === false) {
+    message = "Oops! Try again";
+  }
+  textAlign(CENTER, CENTER);
+  text(message, 130, 45);
+  textAlign(LEFT, BASELINE);
+  //fill(0);
+  textSize(42);
+}
+
+function levels() {
+  if (practice === false) {
+    if (score <= 6) {
+      level = 1;
+    } else if (score > 6 && last7 >= 4 && level == 1) {
+      changeLevels = true;
+      redraw();
+      level = 2;
+      last7 = 3;
+    } else if (score > 12 && last7 >= 4 && level == 2) {
+      changeLevels = true;
+      redraw();
+      level = 3;
+      last7 = 4;
+    } else if (score > 18 && last7 >= 4 && level == 3) {
+      changeLevels = true;
+      redraw();
+      level = 4;
+      last7 = 4;
+    } else if (level == 4 && score > 26 && last7 >= 5) {
+      gameOver();
+      noLoop();
+    }
+    textSize(16);
+    fill(0);
+    noStroke();
+    text("Level: " + level + " / 4", 350, 30);
+  } else if (practice === true) {
+    textSize(16);
+    fill(0);
+    text("Level: " + level + " practice", 350, 30);
+  }
+
+}
+
+function circleTimer() {
+  if (timer <= 160) {
+    background(0, 88, 160);
+    stroke(0);
+    fill(255);
+    ellipse(500 / 2, 450 / 2, 200, 200);
+    fill(142, 179, 218);
+    arc(500 / 2, 450 / 2, 200, 200, 0, timer * 2 * PI / (160), PIE);
+    fill(255);
+    ellipse(500 / 2, 450 / 2, 150, 150);
+    textAlign(CENTER, CENTER);
+    fill(0);
+    textSize(32);
+    text("Going to", width / 2, height / 2 - 130);
+    text("Level " + level, width / 2, height / 2 + 10);
+    loop();
+  } else if (timer > 161) {
+    changeLevels = false;
+    textAlign(LEFT, BASELINE);
+    textSize(42);
+    timer = 0;
+  }
+}
+
+
+//
+
+function chooseLevels() {
+  background(0, 88, 160);
+  textSize(42);
+  textAlign(CENTER);
+  fill(255);
+  text("More or Less", 250, 70);
+  textSize(16);
+  textAlign(LEFT);
+  text("PLAY -- press 'p' to begin or click", 50, 120);
+  stroke(142, 179, 218);
+  //PLAY rectangle
+  rect(320, 100, 60, 30);
+  noStroke();
+  fill(0);
+  text("PLAY", 330, 120);
+  fill(255);
+  text("PRACTICE -- Type a number or click", 50, 180);
+  text("         : add 10 to a number", 55, 210);
+  text("         : subtract 10 from a number", 55, 240);
+  text("         : add a multiple of 10 to a number", 55, 270);
+  text("         : subtract a multiple of 10 from a number", 55, 300);
+  stroke(142, 179, 218);
+  rect(35, 195, 58, 20);
+  rect(35, 225, 58, 20);
+  rect(35, 255, 58, 20);
+  rect(35, 285, 58, 20);
+  noStroke();
+  fill(0);
+  text("Level 1", 38, 210);
+  text("Level 2", 38, 240);
+  text("Level 3", 38, 270);
+  text("Level 4", 38, 300);
+  fill(255);
+  selectLevels();
+}
+
+function selectLevels() {
+
+  draw_restart_button();
+
+  if (key == 'p') {
+    level = 1;
+    practice = false;
+  } else if (key === '1') {
+    level = 1;
+    score = 0;
+    practice = true;
+  } else if (key === '2') {
+    level = 2;
+    score = 0;
+    practice = true;
+  } else if (key === '3') {
+    level = 3;
+    score = 0;
+    practice = true;
+  } else if (key === '4') {
+    level = 4;
+    score = 0;
+    practice = true;
+  }
+}
+
+
+
+
+
+
+function keyTyped() {
+  if (((key == 'a') && (pos == 0)) || ((key == 'b') && (pos == 1)) || ((key == 'c') && (pos == 2)) || ((key == 'd') && (pos == 3))) {
+    attempts += 1;
+    score += 1;
+    if (last7 < 7) {
+      last7 = last7 + 1;
+    }
+    correct = true;
+    draw();
+  } else if (key == 'a' || key == 'b' || key == 'c' || key == 'd') {
+    attempts += 1;
+    if (last7 > 0) {
+      last7 = last7 - 1;
+    }
+    correct = false;
+    score_keep();
+  }
+}
+
+function touchStarted() {
+  if (level === 0) {
+    if (mouseX >= 320 && mouseX <= 380 && mouseY >= 100 && mouseY <= 130) {
+      key = 'p';
+    } else if (mouseX >= 35 && mouseX <= 93 && mouseY >= 195 && mouseY <= 215) {
+      key = '1';
+    } else if (mouseX >= 35 && mouseX <= 93 && mouseY >= 225 && mouseY <= 245) {
+      key = '2';
+    } else if (mouseX >= 35 && mouseX <= 93 && mouseY >= 255 && mouseY <= 275) {
+      key = '3';
+    } else if (mouseX >= 35 && mouseX <= 93 && mouseY >= 285 && mouseY <= 305) {
+      key = '4';
+    }
+    selectLevels();
+  } else if (level > 0) {
+    if (mouseX >= 24 && mouseX <= 104 && mouseY >= 190 && mouseY <= 270) {
+      fill(100);
+      rect(24, 190, 80, 80);
+      key = 'a';
+    } else if (mouseX >= 124 && mouseX <= 204 && mouseY >= 190 && mouseY <= 270) {
+      fill(100);
+      rect(124, 190, 80, 80);
+      key = 'b';
+    } else if (mouseX >= 224 && mouseX <= 304 && mouseY >= 190 && mouseY <= 270) {
+      fill(100);
+      rect(224, 190, 80, 80);
+      key = 'c';
+    } else if (mouseX >= 324 && mouseX <= 404 && mouseY >= 190 && mouseY <= 270) {
+      fill(100);
+      rect(324, 190, 80, 80);
+      key = 'd';
+    } else {
+      return false;
+    }
+    keyTyped();
+  }
+
+}
+
+function touchEnded() {
+  fill(255);
+
+}
+
+
+function gameOver() {
+  background(0, 88, 160);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(42);
+  text("Game Over", width / 2, height / 2);
+  textSize(24);
+  text("Final Score: " + score + " out of " + attempts + " attempts.", width / 2, height / 2 + 40);
+  text("Percent Correct: " + Math.round(score / attempts * 100) + " %", width / 2, height / 2 + 80);
+
+}
+
+function draw_restart_button() {
+  fill(60)
+  ellipse(368, 380, 45, 45);
+  stroke(255);
+  ellipse(368, 380, 32, 32);
+  arc(368, 380, 19, 19, 0, 1.5 * PI);
+  fill(0);
+  textSize(16);
+  textAlign(LEFT, BASELINE);
+  noStroke();
+  text("Press            to restart", 300, 383);
+  fill(255);
+  triangle(368, 375.5, 368, 367.5, 373.5, 371.5)
+  fill(255);
+}
+
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+}
+
+
+
+let nums = [20, 30, 40, 50, 60, 70, 80, 90];
+let pos = 0;
+let score = 0;
+let attempts = 0;
+let r = 0;
+let s = 0;
+let message = ' ';
+let correct = 0;
+let level = 0;
+let arr = [0];
+let ans = 0;
+let practice = false;
+let timer = 0;
+let changeLevels = false;
+let last7 = 0;
+
+
+function start() {
+  background(255);
+  fill(255);
+  strokeWeight(2);
+  stroke(222, 232, 244);
+  ellipse(345, 130, 80, 80);
+  // question mark circle
+  fill(255);
+  rect(24, 190, 80, 80);
+  rect(124, 190, 80, 80);
+  rect(224, 190, 80, 80);
+  rect(324, 190, 80, 80);
+  fill(0, 88, 160);
+  stroke(222, 232, 244);
+  // message rectangle
+  rect(40, 25, 170, 40);
+  fill(0);
+  noStroke();
+}
